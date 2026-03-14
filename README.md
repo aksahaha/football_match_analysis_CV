@@ -1,30 +1,97 @@
 # YOLO Football
 
-This repository contains utilities for detecting and tracking football players, referees and the ball using Ultralytics YOLO and ByteTrack (via `supervision`).
+This project detects and tracks **football players, referees, and the ball** in match footage using **Ultralytics YOLO** for object detection and **ByteTrack (via Supervision)** for multi-object tracking. The system processes video frames, detects objects, assigns consistent tracking IDs, and generates an annotated output video.
 
-Structure
-- `main.py`, `yolo_interface.py`: top-level scripts to run the pipeline.
-- `utils/`: helper utilities (video I/O, bbox helpers).
-- `trackers/`: tracking and annotation functionality.
-- `training/`: datasets and training artefacts.
+---
 
-Quickstart
-1. Create and activate a Python virtual environment (Windows):
+## Project Structure
 
-```powershell
-python -m venv .venv
-& .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
+yolo_football  
+├── main.py  
+├── yolo_interface.py  
+├── utils/  (Video reading and saving utilities)  
+├── trackers/  (Tracking logic and training notebook)  
+│   └── training_notebook.ipynb  
+├── training/  (Dataset and training artifacts)  
+├── input_videos/  
+│   └── sample.mp4  
+├── output_videos/  
+└── models/  
+  └── best.pt (Trained YOLO model)
 
-2. Run the main script (example):
+---
 
-```powershell
-py main.py
-```
+## Dataset
 
-Notes
-- The tracker uses a YOLO model checkpoint; change the model path in `main.py` or when creating a `Tracker` instance.
-- `requirements.txt` lists the primary dependencies used in the project.
+The model was trained using an annotated dataset from Roboflow:
 
-If you'd like a full project reorganization (move modules to `src/` or add packaging), tell me and I will scaffold it.
+https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc/dataset/1
+
+The dataset contains labeled bounding boxes for:
+
+- Players  
+- Referees  
+- Ball  
+
+This allows the model to distinguish **players and referees from other people in the scene**.
+
+---
+
+## Model Training
+
+Inside the **trackers** folder there is a notebook used for training the YOLO model.  
+The notebook loads the annotated dataset, converts it into YOLO format, trains the model, and exports the best trained weights.
+
+The trained model is saved as:
+
+models/best.pt
+
+This trained model is then used in the detection and tracking pipeline.
+
+---
+
+## Pipeline
+
+Video  
+→ Frame Extraction  
+→ YOLO Detection  
+→ Convert to Supervision Detection format  
+→ ByteTrack Multi-Object Tracking  
+→ Annotated Output Video  
+
+The tracker assigns consistent IDs to players and referees across frames.
+
+Example:
+
+Player #1  
+Player #5  
+Referee #2  
+Ball #9  
+
+---
+
+## Setup
+
+Create and activate a virtual environment:
+
+python -m venv .venv  
+.\.venv\Scripts\Activate.ps1  
+pip install -r requirements.txt  
+
+---
+
+## Run the Project
+
+python main.py
+
+The processed video will be saved to:
+
+output_videos/output_video.avi
+
+---
+
+## Notes
+
+- The model checkpoint path can be modified in `main.py`.
+- All dependencies required for the project are listed in `requirements.txt`.
+- The tracker combines YOLO detection with ByteTrack tracking to maintain object IDs across frames.
