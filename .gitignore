@@ -1,0 +1,10 @@
+*.pt
+*.avi
+runs/
+output_videos/
+.venv/
+*pt
+*.avi
+runs/
+output_videos/
+__pycache__/
